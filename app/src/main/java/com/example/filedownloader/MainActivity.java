@@ -13,9 +13,13 @@ import android.os.Bundle;
 
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -37,6 +41,9 @@ import okio.BufferedSink;
 import okio.Okio;
 import okio.Sink;
 
+import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
+import static android.view.KeyEvent.KEYCODE_BACK;
+
 /*
  * Weview加载js、html文件
  *
@@ -46,12 +53,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //todo 如果是assert不是下载文件的话直接用
     //webView.loadUrl("file:////android_asset/A4.html");
+
     @SuppressLint("JavascriptInterface")
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         webView = findViewById(R.id.webView);
         //支持放大网页功能
         webView.getSettings().setAllowFileAccess(true);
@@ -65,6 +74,63 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         webView.setWebChromeClient(new WebChromeClient());
         webView.addJavascriptInterface(MainActivity.this, "java");//name:android在网页里面可以用window.name.方法名调用java方法
         findViewById(R.id.tv_download).setOnClickListener(this);
+
+
+//        //----------------webviewCookie---------------------------------------//
+//        //todo cookie设置
+//        CookieSyncManager.createInstance(this);
+//        CookieManager cookieManager = CookieManager.getInstance();
+//        cookieManager.setAcceptCookie(true);
+//        String cookie = "name=xxx;age=18";
+//        cookieManager.setCookie(URL, cookie);
+//        CookieSyncManager.getInstance().sync();
+//        //todo 获取cookie
+//        CookieManager cookieManager1 = CookieManager.getInstance();
+//        String cookie1 = cookieManager1.getCookie(URL);
+//        //todo 清除cookie
+//        CookieSyncManager.createInstance(getApplicationContext());
+//        CookieManager cookieManager2 = CookieManager.getInstance();
+//        cookieManager2.removeAllCookie();
+//        CookieSyncManager.getInstance().sync();
+
+
+//        //----------------webview缓存---------------------------------------//
+//        //优先使用缓存:
+//        webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+////缓存模式如下：
+////LOAD_CACHE_ONLY: 不使用网络，只读取本地缓存数据
+////LOAD_DEFAULT: （默认）根据cache-control决定是否从网络上取数据。
+////LOAD_NO_CACHE: 不使用缓存，只从网络获取数据.
+////LOAD_CACHE_ELSE_NETWORK，只要本地有，无论是否过期，或者no-cache，都使用缓存中的数据。
+//        //不使用缓存:
+//        webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+//        //清除网页访问留下的缓存
+////由于内核缓存是全局的因此这个方法不仅仅针对webview而是针对整个应用程序.
+//        // TODO 清理缓存
+//        webView.clearCache(true);
+//
+////清除当前webview访问的历史记录
+////只会webview访问历史记录里的所有记录除了当前访问记录
+//        webView.clearHistory();
+//
+////这个api仅仅清除自动完成填充的表单数据，并不会清除WebView存储到本地的数据
+//        webView.clearFormData();
+//
+//        另外一种方式:
+////删除缓存文件夹
+//        File file = CacheManager.getCacheFileBaseDir();
+//
+//        if (file != null && file.exists() && file.isDirectory()) {
+//            for (File item : file.listFiles()) {
+//                item.delete();
+//            }
+//            file.delete();
+//        }
+//
+////删除缓存数据库
+//        getApplication().deleteDatabase("webview.db");
+//        getApplication().deleteDatabase("webviewCache.db");
+
     }
 
     @Override
@@ -141,6 +207,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
     }
-
-
+//todo Back键控制网页后退
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if ((keyCode == KEYCODE_BACK) && webView.canGoBack()) {
+//            webView.goBack();
+//            return true;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
 }
